@@ -1,0 +1,49 @@
+replicaCount: 1
+clusterName: Stage
+pathBase: /webstatus
+secretProviderClass: keys-stage
+
+image:
+  repository: webstatus
+  tag: main
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  annotations: {}
+  tls: []
+
+resources: {}
+
+autoscaling:
+  enabled: false
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# env defines the environment variables that will be declared in the pod
+env:
+  urls:
+  # configmap declares variables which value is taken from the config map defined in template configmap.yaml (name is name of var and key the key in configmap).
+  configmap:
+    - name: HealthChecksUI__HealthChecks__0__Name
+      key: name__microserviceone__hc
+    - name: HealthChecksUI__HealthChecks__0__Uri
+      key: internalurls__microserviceone__hc
+    - name: EvaluationTimeinSeconds
+      key: evaluationTimeinSeconds
+  # values define environment variables with a fixed value (no configmap involved) (name is name of var, and value is its value)
+  values:
+    - name: ASPNETCORE_ENVIRONMENT
+      value: Staging
+  # secrets define environment variables which value is taken from the secrets (Azure Key Vault) (name is name of environment var, key is the name in Azure Key Vault)
+  secrets:
+    - name: ApplicationInsights__InstrumentationKey
+      key: applicationInsights

@@ -1,0 +1,59 @@
+replicaCount: 1
+clusterName: Production
+pathBase: /webstatus
+secretProviderClass: keys-prod
+
+image:
+  repository: webstatus
+  tag: main
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  annotations: {}
+  tls: []
+
+resources:
+  requests:
+    cpu: 300m
+    memory: 200Mi
+  limits:
+    cpu: 400m
+    memory: 300Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 90
+  targetMemoryUtilizationPercentage: 90
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# env defines the environment variables that will be declared in the pod
+env:
+  urls:
+  # configmap declares variables which value is taken from the config map defined in template configmap.yaml (name is name of var and key the key in configmap).
+  configmap:
+    - name: HealthChecksUI__HealthChecks__0__Name
+      key: name__microserviceone__hc
+    - name: HealthChecksUI__HealthChecks__0__Uri
+      key: internalurls__microserviceone__hc
+    - name: EvaluationTimeinSeconds
+      key: evaluationTimeinSeconds
+  # values define environment variables with a fixed value (no configmap involved) (name is name of var, and value is its value)
+  values:
+    - name: ASPNETCORE_ENVIRONMENT
+      value: Production
+  # secrets define environment variables which value is taken from the secrets (Azure Key Vault) (name is name of environment var, key is the name in Azure Key Vault)
+  secrets:
+    - name: ApplicationInsights__InstrumentationKey
+      key: applicationInsights

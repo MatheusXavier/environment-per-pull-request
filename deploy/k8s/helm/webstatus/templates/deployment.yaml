@@ -1,0 +1,98 @@
+{{- $name := include "webstatus.fullname" . -}}
+{{- $cfgname := printf "%s-%s" "cfg" $name -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "webstatus.fullname" . }}
+  labels:
+    ufo: {{ $cfgname}}
+    app: {{ template "webstatus.name" . }}
+    chart: {{ template "webstatus.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "webstatus.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "webstatus.name" . }}
+        release: {{ .Release.Name }}
+        date: "{{ now | unixEpoch }}"
+      annotations:
+        secret.reloader.stakater.com/reload: "appsecrets"
+      {{ if .Values.inf.mesh.enabled -}}
+        linkerd.io/inject: enabled
+      {{- end }}
+    spec:
+      {{ if .Values.inf.registry -}}
+      imagePullSecrets:
+      - name: {{ .Values.inf.registry.secretName }}
+      {{- end }}
+      volumes:
+        - name: secrets-store01-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ .Values.secretProviderClass }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ template "fqdn-image" . }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+            - name: secrets-store01-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+          env:
+            - name: PATH_BASE
+              value: {{ include "pathBase" . }}
+            - name: k8sname
+              value: {{ .Values.clusterName }}
+          {{- if .Values.env.values -}}
+          {{- range .Values.env.values }}
+            - name: {{ .name }}
+              value: {{ .value | quote }}
+          {{- end -}}
+          {{- end -}}
+          {{- if .Values.env.configmap -}}
+          {{- range .Values.env.configmap }}
+            - name: {{ .name }}
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ $cfgname }}
+                  key: {{ .key }}
+          {{- end -}}
+          {{- end }}
+          {{- if .Values.env.secrets -}}
+          {{- range .Values.env.secrets }}
+            - name: {{ .name }}
+              valueFrom:
+                secretKeyRef:
+                  name: appsecrets
+                  key: {{ .key }}
+          {{- end -}}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

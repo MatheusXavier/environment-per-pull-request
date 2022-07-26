@@ -1,0 +1,15 @@
+{{- $name := include "webstatus.fullname" . -}}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "cfg-{{ $name }}"
+  labels:
+    app: {{ template "webstatus.name" . }}
+    chart: {{ template "webstatus.chart" .}}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  name__microserviceone__hc: Microservice One Health Check
+  internalurls__microserviceone__hc: http://microserviceone/hc
+  evaluationTimeinSeconds: "30"
