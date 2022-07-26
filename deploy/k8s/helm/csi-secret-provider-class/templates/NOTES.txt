@@ -1,0 +1,2 @@
+CSI Secret Provider Class is installed.
+----------------------------------------------

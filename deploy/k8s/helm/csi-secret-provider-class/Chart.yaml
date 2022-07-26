@@ -1,0 +1,6 @@
+apiVersion: v2
+name: csi-secret-provider-class
+description: A Helm chart to create a SecretProviderClass resource
+type: application
+version: 0.1.0
+appVersion: "1.16.0"

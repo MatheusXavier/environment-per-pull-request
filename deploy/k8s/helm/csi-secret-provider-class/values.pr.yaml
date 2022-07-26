@@ -1,0 +1,23 @@
+prEnvironment: ""
+userAssignedIdentityID: ""
+keyvaultName: ""
+tenantId: ""
+serviceProviderClassName: ""
+secretName: "appsecrets"
+secretType: "Opaque"
+
+secrets:
+  - name: "{{ .Values.prEnvironment }}-appInsights"
+  - name: "{{ .Values.prEnvironment }}-sqlDb"
+  - name: "{{ .Values.prEnvironment }}-redis"
+  - name: "{{ .Values.prEnvironment }}-storage"
+
+secretObjects:
+  - key: applicationInsights
+    objectName: "{{ .Values.prEnvironment }}-appInsights"
+  - key: sqlDatabase
+    objectName: "{{ .Values.prEnvironment }}-sqlDb"
+  - key: redisCache
+    objectName: "{{ .Values.prEnvironment }}-redis"
+  - key: azureStorage
+    objectName: "{{ .Values.prEnvironment }}-storage"

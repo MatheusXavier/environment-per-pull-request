@@ -1,0 +1,22 @@
+userAssignedIdentityID: ""
+keyvaultName: ""
+tenantId: ""
+serviceProviderClassName: ""
+secretName: "appsecrets"
+secretType: "Opaque"
+
+secrets:
+  - name: appInsights
+  - name: sqlDb
+  - name: redis
+  - name: storage
+
+secretObjects:
+  - key: applicationInsights
+    objectName: appInsights
+  - key: sqlDatabase
+    objectName: sqlDb
+  - key: redisCache
+    objectName: redis
+  - key: azureStorage
+    objectName: storage
