@@ -34,9 +34,9 @@ env:
   # configmap declares variables which value is taken from the config map defined in template configmap.yaml (name is name of var and key the key in configmap).
   configmap:
     - name: HealthChecksUI__HealthChecks__0__Name
-      key: name__microserviceone__hc
+      key: name__mobileapigw__hc
     - name: HealthChecksUI__HealthChecks__0__Uri
-      key: internalurls__microserviceone__hc
+      key: internalurls__mobileapigw__hc
     - name: EvaluationTimeinSeconds
       key: evaluationTimeinSeconds
   # values define environment variables with a fixed value (no configmap involved) (name is name of var, and value is its value)
